@@ -1,0 +1,16 @@
+Changelog for Carson and Carrie: (Jiachen Liu and Kaixuan Wang, Team 60)
+
+March 29, 2018
+-	Carson: Research on Fast Fourier Transform
+-	Carrie: Research on Fast Fourier Transform
+March 30, 2018
+-	Carson: Reimplementation of wave drawing to account for refresh rate of monitor
+-	Carrie: Tried different Fast Fourier Transform algorithm 
+March 31, 2018
+-	Carson: hanged wave drawing to sample and store into array then print from array
+-	Carrie: Implemented Fast Fourier Transform c algorithm and tested it
+April 1, 2018
+-	Carson: Added refresh rate wait
+-	Carrie: Linked algorithm to assembly project, it takes double array input and returns a double array of amplitude (frequency domain)
+
+

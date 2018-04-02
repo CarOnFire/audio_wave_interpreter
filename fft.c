@@ -1,3 +1,8 @@
+/*
+ * Implementation of FFT done by http://www.guitarscience.net/papers/fftalg.pdf
+ * Simple Fast Fourier Transformation Algorithms in C
+ */
+
 #include <stdio.h>
 #include <math.h>
 #define TRSIZ 4
@@ -13,7 +18,7 @@ double* fft_func(double *data1) {
     data = &data1[0] - 1;
     n = N * 2;
     j = 1;
-	double *amp;
+    double *amp;
     // do the bit-reversal
     for (i = 1; i < n; i += 2) {
         if (j > i) {
@@ -46,10 +51,7 @@ double* fft_func(double *data1) {
                 data[j + 1] = data[i + 1] - tempi;
                 data[i] = data[i] + tempr;
                 data[i + 1] = data[i + 1] + tempi;
-                //printf("\ni = %d ,j = %d, m = %d, wr = %f , wi = %f", (i - 1) / 2, (j - 1) / 2, m, wr, wi);
             }
-            // printf("\nm = %d ,istep = %d, mmax = %d, wr = %f , wi = %f, Z = %f"
-            //            , m, istep, mmax, wr, wi, atan(wi / wr) / (6.28318530717959 / (1.0 * n / 2)));
             wtemp = wr;
             wr += wtemp * wpr - wi*wpi;
             wi += wtemp * wpi + wi*wpr;
@@ -57,17 +59,16 @@ double* fft_func(double *data1) {
         mmax = istep;
     }
     // print the results
-    //printf("\nFourier components from the DIT algorithm:");
-	unsigned x=0;
+    unsigned x=0;
     for (k = 0; k < 2 * N; k += 2){
       //  printf("\n%f %f", data[k + 1], data[k + 2]);
-	   amp[x]=sqrt(data[k+1]*data[k+1]+data[k+2]*data[k+2]);
+        amp[x]=sqrt(data[k+1]*data[k+1]+data[k+2]*data[k+2]);
 		//printf("\n%f",amp[x]);
-		x=x+1;
-}
-for (unsigned y=0;y<sizeof(amp);y++){
-printf("\n%f",amp[y]);
-}
-return amp;
+        x=x+1;
+    }
+    for (unsigned y=0;y<sizeof(amp);y++){
+        printf("\n%f",amp[y]);
+    }
+    return amp;
 } // end of dittt()
 

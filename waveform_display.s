@@ -41,7 +41,9 @@ _start:
      
     clear_fifo: movia r18, ADDR_AUDIODACFIFO
     ldwio r2,12(r18) # Load mic
+    stwio r2,12(r18) 
     ldwio r2,8(r18) 
+    stwio r2,8(r18) 
     ldwio r2, 4(r18)      # Read fifospace register 
     andi  r2, r2, 0xff    # Extract # of samples in Input Right Channel FIFO 
     bne   r2, r0, clear_fifo  # If no samples in FIFO, go back to start 
@@ -56,7 +58,9 @@ _start:
     beq   r2, r0, check_fifo  # If no samples in FIFO, go back to start 
     
     ldwio r2,12(r18) # Load mic
+    stwio r2,12(r18) # Load mic
     ldwio r2,8(r18) 
+    stwio r2,8(r18) 
     div r18, r2, r17 # Normalize right shift by 2^(r2)
     
     subi r21, r21, 4

@@ -56,9 +56,7 @@ _start:
     beq   r2, r0, check_fifo  # If no samples in FIFO, go back to start 
     
     ldwio r2,12(r18) # Load mic
-    stwio r2,12(r18) # Load mic
     ldwio r2,8(r18) 
-    stwio r2,8(r18) 
     div r18, r2, r17 # Normalize right shift by 2^(r2)
     
     subi r21, r21, 4

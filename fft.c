@@ -1,6 +1,8 @@
+
 #include <stdio.h>
 #include <math.h>
-#define TRSIZ 4
+#include <stdlib.h>
+//#define TRSIZ 4
 #define SWAP(a,b) tempr=(a); (a)=(b); (b)=tempr
 
 
@@ -9,17 +11,27 @@
  * Simple Fast Fourier Transformation Algorithms in C
  */
 
-float* fft_func(float *data1) {
+int* fft_func(int* data_input,int size) {
     float wtemp, wr, wpr, wpi, wi, theta;
     float tempr, tempi;
-    int N = TRSIZ;
+    int N = size;
+   // printf("\n%d",N);
     int i = 0, j = 0, n = 0, k = 0, m = 0, isign = -1, istep, mmax;
+	float data1[2*N];
+	for (unsigned i=0;i<N*2;i=i+2){
+  		data1[i]=0;
+		data1[i+1]=data_input[i/2];
+	}
+        for(unsigned i=0;i<N*2;i++){
+           // printf("\n%f",data1[i]);
+        }
+        
     //float data1[2 * TRSIZ]= {1, 0, 0, 0, 1, 0, 0, 0};
     float *data;
     data = &data1[0] - 1;
     n = N * 2;
     j = 1;
-    float *amp;
+    int amp[N];
     // do the bit-reversal
     for (i = 1; i < n; i += 2) {
         if (j > i) {
@@ -63,11 +75,14 @@ float* fft_func(float *data1) {
 
     unsigned x=0;
     for (k = 0; k < 2 * N; k += 2){
-        amp[x]=sqrt(data[k+1]*data[k+1]+data[k+2]*data[k+2]);
+       int temp=round(sqrt(data[k+1]*data[k+1]+data[k+2]*data[k+2]));
+       printf("\n%f,%f",data[k+1],data[k+2]);
+		amp[x]=temp;
+ //printf("\n%d",temp);
         x=x+1;
     }
-    for (unsigned y=0;y<sizeof(amp);y++){
-        printf("\n%f",amp[y]);
+    for (unsigned y=0;y<N;y++){
+       //printf("\n%d",amp[y]);
     }
     return amp;
 } // end of dittt()

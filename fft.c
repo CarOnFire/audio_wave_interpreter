@@ -2,36 +2,44 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-//#define TRSIZ 4
+#define SIZE 256
 #define SWAP(a,b) tempr=(a); (a)=(b); (b)=tempr
 
 
 /*
- * Implementation of FFT done by http://www.guitarscience.net/papers/fftalg.pdf
- * Simple Fast Fourier Transformation Algorithms in C
- */
+* Implementation of FFT done by http://www.guitarscience.net/papers/fftalg.pdf
+* Simple Fast Fourier Transformation Algorithms in C
+*/
 
-int* fft_func(int* data_input,int size) {
+int* fft_func(int* data_input) {
     float wtemp, wr, wpr, wpi, wi, theta;
     float tempr, tempi;
-    int N = size;
-   // printf("\n%d",N);
+    int N = SIZE;
+    float data1[2 * SIZE];
     int i = 0, j = 0, n = 0, k = 0, m = 0, isign = -1, istep, mmax;
-	float data1[2*N];
-	for (unsigned i=0;i<N*2;i=i+2){
-  		data1[i]=0;
-		data1[i+1]=data_input[i/2];
-	}
-        for(unsigned i=0;i<N*2;i++){
-           // printf("\n%f",data1[i]);
-        }
-        
+    printf("\n%d", N);
+
+    
+    for (unsigned i = 0; i<N * 2; i = i + 2) {
+        data1[i] = 0;
+        data1[i + 1] = data_input[i / 2];
+    }
+    // for(unsigned i=0;i<N*2;i++){
+    //    printf("\n%f",data1[i]);
+    // }
+
+    // for (unsigned i = 0; i<N; i++) {
+    //    // printf("\n%x", &data_input[i]);
+    //     printf("\nData in: %x", data_input[i]);
+    // }
+
     //float data1[2 * TRSIZ]= {1, 0, 0, 0, 1, 0, 0, 0};
     float *data;
     data = &data1[0] - 1;
     n = N * 2;
     j = 1;
-    int amp[N];
+    // int amp[SIZE];
+   // int *amp2=data_input;
     // do the bit-reversal
     for (i = 1; i < n; i += 2) {
         if (j > i) {
@@ -65,25 +73,28 @@ int* fft_func(int* data_input,int size) {
                 data[i] = data[i] + tempr;
                 data[i + 1] = data[i + 1] + tempi;
             }
-            
+
             wtemp = wr;
-            wr += wtemp * wpr - wi*wpi;
-            wi += wtemp * wpi + wi*wpr;
+            wr += wtemp * wpr - wi * wpi;
+            wi += wtemp * wpi + wi * wpr;
         }
         mmax = istep;
     }
 
-    unsigned x=0;
-    for (k = 0; k < 2 * N; k += 2){
-       int temp=round(sqrt(data[k+1]*data[k+1]+data[k+2]*data[k+2]));
-       printf("\n%f,%f",data[k+1],data[k+2]);
-		amp[x]=temp;
- //printf("\n%d",temp);
-        x=x+1;
+    unsigned x = 0;
+    for (k = 0; k < 2 * N; k += 2) {
+        int temp = round(sqrt(data[k + 1] * data[k + 1] + data[k + 2] * data[k + 2]));
+       // printf("\n%f,%f", data[k + 1], data[k + 2]);
+        // amp[x] = temp;
+        data_input[x]=temp;
+       // printf("\n%d",temp);
+        x = x + 1;
     }
-    for (unsigned y=0;y<N;y++){
-       //printf("\n%d",amp[y]);
-    }
-    return amp;
+
+    // for (unsigned y = 0; y<N; y++) {
+    //    // printf("\nAmp out: %x",amp[y]);
+    //   printf("\nData out: %x",data_input[y]);
+    // }
+    return data_input;
 } // end of dittt()
 

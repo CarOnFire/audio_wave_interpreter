@@ -85,7 +85,7 @@ FillLine:
     stw ra, 12(sp)
     
     # Two loops to draw each pixel
-    movi r17, HEIGHT
+    movi r17, HEIGHT+1
     mov r18, r4
     mov r16, r5
         fl_1:  subi r17, r17, 1

@@ -1,4 +1,3 @@
-# 320x240, 1024 bytes/row, 2 bytes per pixel: DE1-SoC
 .equ WIDTH, 320
 .equ HEIGHT, 240
 .equ ADDR_AUDIODACFIFO, 0xFF203040
@@ -12,8 +11,18 @@ DATA_IN:
     .skip 2052
 
 .text
-.global drawFreq
 
+/*
+ * Function for drawing the frequency spectrum.
+ * Actual Fast Fourier Transform is being done by a C program.
+ * This function stores samples into an array and 
+ * passes it to the C program
+ * If size is to be changed, both in this file as well as the 
+ * C program will have to be changed.
+ * No parameters or return values.
+ */
+
+.global drawFreq
 drawFreq:
     subi sp, sp, 16
     stw ra, 0(sp)

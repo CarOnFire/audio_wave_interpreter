@@ -9,6 +9,8 @@
 /*
 * Implementation of FFT done by http://www.guitarscience.net/papers/fftalg.pdf
 * Simple Fast Fourier Transformation Algorithms in C
+*
+* Has been modified to work better with the assembly code.
 */
 
 int* fft_func(int* data_input) {

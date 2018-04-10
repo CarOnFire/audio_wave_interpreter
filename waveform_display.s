@@ -13,8 +13,14 @@ WAVE_DATA:
     .skip 1288
 
 .text
-.global drawWave
 
+/*
+ * Function which draws a sound wave from the microphone input onto the VGA.
+ * No values need to be passes, there is also no return values. Values that are
+ * too big or small will be normalized to the max and min of the screen
+ */
+
+.global drawWave
 drawWave:
     subi sp, sp, 16
     stw ra, 0(sp)

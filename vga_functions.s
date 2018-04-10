@@ -1,6 +1,3 @@
-
-
-# 320x240, 1024 bytes/row, 2 bytes per pixel: DE1-SoC
 .equ WIDTH, 319
 .equ HEIGHT, 239
 .equ X_OFFSET, 10

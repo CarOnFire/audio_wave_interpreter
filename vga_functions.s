@@ -4,13 +4,15 @@
 .equ LOG2_BYTES_PER_ROW, 10
 .equ LOG2_BYTES_PER_PIXEL, 1
 .equ PIXBUF, 0x08000000 # Pixel buffer. Same on all boards.
+.equ AMP_START, 200
 
-# r4: colour
-# r5: col
-# r6: height (must be positive number)
+.global FillLine
+.global FillColour
+.global WritePixel
+.global FillSegment
 
 FillSegment:
-	subi sp, sp, 20
+    subi sp, sp, 20
     stw r15, 0(sp) # Save some registers
     stw r16, 4(sp)
     stw r17, 8(sp)
@@ -22,14 +24,14 @@ FillSegment:
     movi r2, AMP_START #get row index for height
     sub r15, r2, r6
     bge r15, r0, start_segment #check if number is larger
-    	mov r15, r0
+        mov r15, r0
         
     # Two loops to draw each pixel
-    start_segment:	movi r17, AMP_START
+    start_segment:  movi r17, AMP_START
         1:  mov r4, r16
             mov r5, r17
             mov r6, r18
-            call WritePixel		# Draw one pixel
+            call WritePixel     # Draw one pixel
             subi r17, r17, 1
             bge r17, r15, 1b
     
@@ -41,8 +43,8 @@ FillSegment:
     addi sp, sp, 20
     ret
 
-# r4: colour
 
+# r4: colour
 FillColour:
     subi sp, sp, 16
     stw r16, 0(sp)      # Save some registers
@@ -85,13 +87,13 @@ FillLine:
     mov r18, r4
     mov r16, r5
     # Two loops to draw each pixel
-    movi r17, HEIGHT-1
-        1:  mov r4, r16
+    1:  movi r17, HEIGHT-1
+        2:  mov r4, r16
             mov r5, r17
             mov r6, r18
             call WritePixel     # Draw one pixel
             subi r17, r17, 1
-            bge r17, r0, 1b
+            bge r17, r0, 2b
     
     ldw ra, 12(sp)
     ldw r18, 8(sp)
@@ -103,7 +105,6 @@ FillLine:
 # r4: col (x)
 # r5: row (y)
 # r6: colour value
-
 WritePixel:
     movi r2, LOG2_BYTES_PER_ROW     # log2(bytes per row)
     movi r3, LOG2_BYTES_PER_PIXEL   # log2(bytes per pixel)
@@ -114,6 +115,9 @@ WritePixel:
     movia r4, PIXBUF
     add r5, r5, r4
     
-    sthio r6, 0(r5)     # Write 16-bit pixel
+    bne r3, r0, 1f      # 8bpp or 16bpp?
+    stbio r6, 0(r5)     # Write 8-bit pixel
     ret
-
+    
+1:  sthio r6, 0(r5)     # Write 16-bit pixel
+    ret

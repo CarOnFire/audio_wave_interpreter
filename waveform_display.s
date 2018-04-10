@@ -1,30 +1,32 @@
-# 320x240, 1024 bytes/row, 2 bytes per pixel: DE1-SoC
 .equ WIDTH, 320
 .equ HEIGHT, 240
-.equ LOG2_BYTES_PER_ROW, 10
-.equ LOG2_BYTES_PER_PIXEL, 1
 .equ ADDR_AUDIODACFIFO, 0xFF203040
 .equ ADDR_SLIDESWITCHES, 0xFF200040
 .equ TIMER1, 0xFF202000
 .equ PIXBUF, 0x08000000	# Pixel buffer. Same on all boards.
-	
-.global _start
-_start:
+.equ MAX_ROW, 239
+.equ MIN_ROW, 0
+.equ CENTER_ROW, 119
 
-	setup:movia sp, 0x80000000	# Initial stack pointer 
-    
-    # Initialization of the screen with black
-	movi r4, 0x0 #moving black into
-    call FillColour		# Fill screen with a colour
-    
-    /*
-     * The stack is decreased to leave space for
-     * the storage of our temporary variable
-     */
-     
-    allocate_space: subi sp, sp, 1288
-    movia r21, 0x80000000
-    movi r10 , 0x0
+.data
+WAVE_DATA:
+    .skip 1288
+
+.text
+
+.global drawWave
+
+drawWave:
+    subi sp, sp, 16
+    stw ra, 0(sp)
+    stw r17, 4(sp)
+    stw r18, 8(sp)
+    stw r21, 12(sp)
+
+    movia r21, WAVE_DATA
+    subi r21, r21, 1288
+
+    mov r10 , r0 #sample counter
     
     /*
      * Reading the switches to determine the shift amount
@@ -63,7 +65,7 @@ _start:
     stw r18, 0(r21) # Storing sample to stack
     addi r10, r10, 1 # Increase counter
     
-    movia r18, WIDTH # Check if enough samples
+    movi r18, WIDTH # Check if enough samples
     beq r10, r18, draw_screen #draw screen is samples are enough
    	br check_fifo
     
@@ -74,25 +76,27 @@ _start:
  
 draw_screen:
 
-	add r10, r0, r21
-    movia r18, WIDTH-1
+	mov r10, r21
+    movi r18, WIDTH-33
     
-	draw: mov r5, r18 #col
-	movi r4, 0x0 #black
+	draw_wave_start:
+    mov r5, r18 #col
+	mov r4, r0 #black
 	call FillLine #erases previous
     
     mov r4, r18 #col
 	movia r6, 0xffffffff #white
     
     ldw r17, 0(r10) #getting array value
-    addi r5, r17, 120 #centering at 120
-    movi r2, 239 #lower limit
+    addi r5, r17, CENTER_ROW #centering at 120
+    movi r2, MAX_ROW #lower limit
 	bgt r5, r2, normalize_down #normalization, incase amplitude is too large
 	blt r5, r0, normalize_up
-    draw_pixel: call WritePixel
+    draw_amp_pixel: call WritePixel
     addi r10, r10, 4 #increase array value
     subi r18, r18, 1 #increase col value
-   	bne r18, r0, draw
+    movi r2, 31
+   	bne r18, r2, draw_wave_start
     
     /*
      * Control for the refresh rate of our wave drawing
@@ -101,102 +105,32 @@ draw_screen:
     movia r18, TIMER1 #timer initialization
     movia r2, 0xB9AA #60 Hz
     stwio r2, 8(r18)
-    movia r2, 0x65
+    movi r2, 0x65
     stwio r2, 12(r18)
     movi r2, 0x4
     stwio r2, 4(r18) #timer start
     
-    check_timer: ldwio r2, 0(r18)
+    check_wave_timer: ldwio r2, 0(r18)
     andi r2, r2, 0x01
-    beq r2, r0, check_timer
+    beq r2, r0, check_wave_timer
     stwio r0, 0(r18) #clearing timer
     
-    movi r10, 0x0 #reset counter
-	movia r21, 0x80000000 # Initial stack pointer
-    br shift_read
+    mov r10, r0 #reset counter
+	movia r21, WAVE_DATA # Initial stack pointer
+    br exit_drawWave
     
 normalize_down:
-	movi r5, 239
-	br draw_pixel
+	movi r5, MAX_ROW
+	br draw_amp_pixel
 
 normalize_up:
-	movi r5, 0
-	br draw_pixel
-    
-# r4: colour
-FillColour:
-	subi sp, sp, 16
-    stw r16, 0(sp)		# Save some registers
-    stw r17, 4(sp)
-    stw r18, 8(sp)
-    stw ra, 12(sp)
-    
-    mov r18, r4
-    
-    # Two loops to draw each pixel
-    movi r16, WIDTH-1
-    1:	movi r17, HEIGHT-1
-        2:  mov r4, r16
-            mov r5, r17
-            mov r6, r18
-            call WritePixel		# Draw one pixel
-            subi r17, r17, 1
-            bge r17, r0, 2b
-        subi r16, r16, 1
-        bge r16, r0, 1b
-    
-    ldw ra, 12(sp)
-	ldw r18, 8(sp)
+	movi r5, MIN_ROW
+	br draw_amp_pixel
+
+exit_drawWave:
+    ldw ra, 0(sp)
     ldw r17, 4(sp)
-    ldw r16, 0(sp)    
+    ldw r18, 8(sp)
+    ldw r21, 12(sp)
     addi sp, sp, 16
     ret
-    
-    
-# r4: colour
-# r5: col
-
-FillLine:
-	subi sp, sp, 16
-    stw r16, 0(sp)		# Save some registers
-    stw r17, 4(sp)
-    stw r18, 8(sp)
-    stw ra, 12(sp)
-    
-    mov r18, r4
-    mov r16, r5
-    # Two loops to draw each pixel
-    1:	movi r17, HEIGHT-1
-        2:  mov r4, r16
-            mov r5, r17
-            mov r6, r18
-            call WritePixel		# Draw one pixel
-            subi r17, r17, 1
-            bge r17, r0, 2b
-    
-    ldw ra, 12(sp)
-	ldw r18, 8(sp)
-    ldw r17, 4(sp)
-    ldw r16, 0(sp)    
-    addi sp, sp, 16
-    ret
-
-# r4: col (x)
-# r5: row (y)
-# r6: colour value
-WritePixel:
-	movi r2, LOG2_BYTES_PER_ROW		# log2(bytes per row)
-    movi r3, LOG2_BYTES_PER_PIXEL	# log2(bytes per pixel)
-    
-    sll r5, r5, r2
-    sll r4, r4, r3
-    add r5, r5, r4
-    movia r4, PIXBUF
-    add r5, r5, r4
-    
-    bne r3, r0, 1f		# 8bpp or 16bpp?
-  	stbio r6, 0(r5)		# Write 8-bit pixel
-    ret
-    
-1:	sthio r6, 0(r5)		# Write 16-bit pixel
-	ret

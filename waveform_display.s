@@ -13,7 +13,6 @@ WAVE_DATA:
     .skip 1288
 
 .text
-
 .global drawWave
 
 drawWave:

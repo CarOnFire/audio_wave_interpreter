@@ -17,29 +17,18 @@ int* fft_func(int* data_input) {
     int N = SIZE;
     float data1[2 * SIZE];
     int i = 0, j = 0, n = 0, k = 0, m = 0, isign = -1, istep, mmax;
-    printf("\n%d", N);
+    printf("\nSize of sample: %d", N);
 
-    
     for (unsigned i = 0; i<N * 2; i = i + 2) {
         data1[i] = 0;
         data1[i + 1] = data_input[i / 2];
     }
-    // for(unsigned i=0;i<N*2;i++){
-    //    printf("\n%f",data1[i]);
-    // }
 
-    // for (unsigned i = 0; i<N; i++) {
-    //    // printf("\n%x", &data_input[i]);
-    //     printf("\nData in: %x", data_input[i]);
-    // }
-
-    //float data1[2 * TRSIZ]= {1, 0, 0, 0, 1, 0, 0, 0};
     float *data;
     data = &data1[0] - 1;
     n = N * 2;
     j = 1;
-    // int amp[SIZE];
-   // int *amp2=data_input;
+
     // do the bit-reversal
     for (i = 1; i < n; i += 2) {
         if (j > i) {
@@ -84,17 +73,10 @@ int* fft_func(int* data_input) {
     unsigned x = 0;
     for (k = 0; k < 2 * N; k += 2) {
         int temp = round(sqrt(data[k + 1] * data[k + 1] + data[k + 2] * data[k + 2]));
-       // printf("\n%f,%f", data[k + 1], data[k + 2]);
-        // amp[x] = temp;
         data_input[x]=temp;
-       // printf("\n%d",temp);
         x = x + 1;
     }
 
-    // for (unsigned y = 0; y<N; y++) {
-    //    // printf("\nAmp out: %x",amp[y]);
-    //   printf("\nData out: %x",data_input[y]);
-    // }
     return data_input;
 } // end of dittt()
 

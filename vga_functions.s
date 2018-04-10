@@ -1,11 +1,11 @@
-# 320x240, 1024 bytes/row, 2 bytes per pixel: DE1-SoC
-.equ WIDTH, 320
-.equ HEIGHT, 240
-.equ LOG2_BYTES_PER_ROW, 10
-.equ LOG2_BYTES_PER_PIXEL, 1
-.equ PIXBUF, 0x08000000 # Pixel buffer. Same on all boards.
-.equ AMP_START, 200
+.equ WIDTH, 319
+.equ HEIGHT, 239
+.equ X_OFFSET, 10
+.equ Y_OFFSET, 1
+.equ PIXELBUFFER, 0x08000000 # Pixel buffer. Same on all boards.
+.equ AMP_START, 210
 
+.text
 .global FillLine
 .global FillColour
 .global WritePixel
@@ -13,7 +13,7 @@
 
 FillSegment:
     subi sp, sp, 20
-    stw r15, 0(sp) # Save some registers
+    stw r15, 0(sp)
     stw r16, 4(sp)
     stw r17, 8(sp)
     stw r18, 12(sp)
@@ -35,7 +35,7 @@ FillSegment:
             subi r17, r17, 1
             bge r17, r15, 1b
     
-    ldw r15, 0(sp) # Save some registers
+    ldw r15, 0(sp) 
     ldw r16, 4(sp)
     ldw r17, 8(sp)
     ldw r18, 12(sp)
@@ -55,8 +55,8 @@ FillColour:
     mov r18, r4
     
     # Two loops to draw each pixel
-    movi r16, WIDTH-1
-    1:  movi r17, HEIGHT-1
+    movi r16, WIDTH
+    1:  movi r17, HEIGHT
         2:  mov r4, r16
             mov r5, r17
             mov r6, r18
@@ -87,7 +87,7 @@ FillLine:
     mov r18, r4
     mov r16, r5
     # Two loops to draw each pixel
-    1:  movi r17, HEIGHT-1
+    1:  movi r17, HEIGHT
         2:  mov r4, r16
             mov r5, r17
             mov r6, r18
@@ -105,19 +105,11 @@ FillLine:
 # r4: col (x)
 # r5: row (y)
 # r6: colour value
-WritePixel:
-    movi r2, LOG2_BYTES_PER_ROW     # log2(bytes per row)
-    movi r3, LOG2_BYTES_PER_PIXEL   # log2(bytes per pixel)
-    
-    sll r5, r5, r2
-    sll r4, r4, r3
-    add r5, r5, r4
-    movia r4, PIXBUF
-    add r5, r5, r4
-    
-    bne r3, r0, 1f      # 8bpp or 16bpp?
-    stbio r6, 0(r5)     # Write 8-bit pixel
-    ret
-    
-1:  sthio r6, 0(r5)     # Write 16-bit pixel
+WritePixel:   
+    slli r5, r5, X_OFFSET #make space for col offset
+    slli r4, r4, Y_OFFSET #offset
+    add r5, r5, r4 #add offset together
+    movia r4, PIXELBUFFER 
+    add r5, r5, r4 #offset the pixel buffer
+    sthio r6, 0(r5)
     ret

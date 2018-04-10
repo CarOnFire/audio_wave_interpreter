@@ -13,4 +13,21 @@ April 1, 2018
 -	Carson: Added refresh rate wait
 -	Carrie: Linked algorithm to assembly project, it takes double array input and returns a double array of amplitude (frequency domain)
 
+Aprril 5, 2018
+-	Carson: working on normalizing audio wave & frequency using switches
+-	Carrie: Fast fourier transform bugfixing(problem with data size)
 
+Aprril 6, 2018
+-	Carson: wrote code for displaying lines on vga, which can be used for displaying freq
+-	Carrie: linked c file to assembly, working on connect it to fifo 
+
+Aprril 7, 2018
+-	Carson: wrote code for keyboard interrupt (reads user input and decide which to show wave/frequency)
+-	Carrie: working on extracting data from fifo and return data array to proper address
+
+Aprril 8, 2018
+-	Carson: linked all parts together
+-	Carrie: fixing displaying frequency 
+Aprril 9, 2018
+-	Carson: final editing
+-	Carrie: final editing

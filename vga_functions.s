@@ -28,12 +28,12 @@ FillSegment:
         
     # Two loops to draw each pixel
     start_segment:  movi r17, AMP_START
-        1:  mov r4, r16
+        fs_1: subi r17, r17, 1  
+            mov r4, r16
             mov r5, r17
             mov r6, r18
-            call WritePixel     # Draw one pixel
-            subi r17, r17, 1
-            bge r17, r15, 1b
+            call WritePixel   
+            bgt r17, r15, fs_1
     
     ldw r15, 0(sp) 
     ldw r16, 4(sp)
@@ -55,16 +55,16 @@ FillColour:
     mov r18, r4
     
     # Two loops to draw each pixel
-    movi r16, WIDTH
-    1:  movi r17, HEIGHT
-        2:  mov r4, r16
-            mov r5, r17
+    movi r16, HEIGHT
+    fc_1: movi r17, WIDTH
+        subi r16, r16, 1
+        fc_2:  subi r17, r17, 1
+            mov r4, r17
+            mov r5, r16
             mov r6, r18
             call WritePixel     # Draw one pixel
-            subi r17, r17, 1
-            bge r17, r0, 2b
-        subi r16, r16, 1
-        bge r16, r0, 1b
+            bgt r17, r0, fc_2
+        bgt r16, r0, fc_1
     
     ldw ra, 12(sp)
     ldw r18, 8(sp)
@@ -84,16 +84,16 @@ FillLine:
     stw r18, 8(sp)
     stw ra, 12(sp)
     
+    # Two loops to draw each pixel
+    movi r17, HEIGHT+1
     mov r18, r4
     mov r16, r5
-    # Two loops to draw each pixel
-    1:  movi r17, HEIGHT
-        2:  mov r4, r16
+        fl_1:  subi r17, r17, 1
+            mov r4, r16
             mov r5, r17
             mov r6, r18
-            call WritePixel     # Draw one pixel
-            subi r17, r17, 1
-            bge r17, r0, 2b
+            call WritePixel
+            bgt r17, r0, fl_1
     
     ldw ra, 12(sp)
     ldw r18, 8(sp)

@@ -25,7 +25,14 @@ movia sp, STACK
 movi r4, 0x0
 call FillColour
 
+
 begin_read:
+
+movia r2, ADDR_SLIDESWITCHES
+    movi r17, 1
+    ldwio r2, 0(r2) #determine shift amount
+    sll r17, r17, r2 # 2^(r2) 
+
 /* allocate space on sp*/
 movia r21, DATA_IN
 subi r21, r21, 2052
@@ -54,10 +61,10 @@ check_fifo:
 
 
 
-    movia r3, ADDR_SLIDESWITCHES
-    #movi r17, 1
-    ldwio r3, 0(r3) #determine shift amount
-    srl r2, r2, r3 # 2^(r2) 
+ 
+    
+
+    div r2, r2, r17 # 2^(r2) 
 
 
     stw r2, 0(r21) # Storing sample to stack
@@ -69,7 +76,7 @@ check_fifo:
     beq r10, r18, fft #draw screen is samples are enough
 
 
-   	br check_fifo
+    br check_fifo
     
 
 # r4: colour
@@ -84,11 +91,12 @@ mov r4 , r21
 call fft_func()
 
 mov r21, r2
-movia r10, WIDTH-1
+movia r10, WIDTH-32
 
 draw_freq:
 subi r10, r10, 1
 addi r21, r21, 4
+
 movia r4, 0x0
 mov r5, r10
 call FillLine
@@ -97,7 +105,20 @@ movia r4, 0xffffffff
 mov r5, r10
 ldw r6, 0(r21)
 call FillSegment
-bne r10, r0, draw_freq
+
+subi r10, r10, 1
+
+movia r4, 0x0
+mov r5, r10
+call FillLine
+
+movia r4, 0xffffffff
+mov r5, r10
+ldw r6, 0(r21)
+call FillSegment
+
+movi r2, 32
+bne r10, r2, draw_freq
 
 /*
      * Control for the refresh rate of our wave drawing

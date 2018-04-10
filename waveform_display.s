@@ -94,7 +94,7 @@ draw_screen:
     
     ldw r17, 0(r10) #getting array value
     addi r5, r17, CENTER_ROW #centering at 120
-    movi r2, MAX_ROW #lower limit
+    movi r2, 239 #lower limit
 	bgt r5, r2, normalize_down #normalization, incase amplitude is too large
 	blt r5, r0, normalize_up
     draw_amp_pixel: call WritePixel
@@ -125,11 +125,11 @@ draw_screen:
     br exit_drawWave
     
 normalize_down:
-	movi r5, MAX_ROW
+	movi r5, 239
 	br draw_amp_pixel
 
 normalize_up:
-	movi r5, MIN_ROW
+	movi r5, 0
 	br draw_amp_pixel
 
 exit_drawWave:

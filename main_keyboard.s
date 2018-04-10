@@ -30,7 +30,7 @@ main:
      */
 
     movia r18, ADDR_PS2 
-    movia r2, IRQ_7 #IRQ line 7
+    movia r2, 0x80 #IRQ line 7
     wrctl ienable, r2
     movia r2, 0x01 #PIE:0 
     stwio r2, 4(r18)
@@ -99,12 +99,12 @@ HANDLER:
      * activated, keyboard interrupt
      */
 
-    rdctl ipending, r2
-    srli r2, IRQ_7
-    andi r2, r2, ISOLATE_1ST_BIT
-
+    rdctl r2, ipending
+	movi r3, 0x7
+    srl r2, r2, r3
+    andi r2, r2, 0x01
     beq r2, r0, interrupt_return
-
+	
     movia r18, ADDR_PS2
     
     check_ps2_fifo:
